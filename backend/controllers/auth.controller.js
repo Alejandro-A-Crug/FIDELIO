@@ -3,7 +3,7 @@ import bcrypt from "bcryptjs";
 import generateTokenSetCookie from "../utils/genWebToken.js";
 export const signup = async (req,res) =>{
     try {
-        const {fullName, username, password, confirmPassword}= req.body;
+        const {fullName, username, password, confirmPassword, gender}= req.body;
 
         if(password !== confirmPassword){
             return res.status(400).json({error: "Passwords do not match"})
@@ -19,19 +19,27 @@ export const signup = async (req,res) =>{
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
         //avatar
-        const pfp = 'https://avatar.iran.liara.run/public';
+        // depends on gender const pfp = `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(username)}`;
 
+     let pfp;
+
+            if(gender === "Male"){
+                pfp = `https://avatar.iran.liara.run/public/boy`;
+            } else if(gender === "Female"){
+                pfp = `https://avatar.iran.liara.run/public/girl`;
+            } else {
+                pfp = `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(username)}`;
+            }
 
         const newUser = new User({
             fullName,
             username,
             password: hashedPassword,
             profilePic: pfp,
+            gender,
         })
 
         if(newUser){
-            //Generating JWT
-         
         await newUser.save();
         generateTokenSetCookie(newUser._id, res);
         res.status(201).json({
@@ -39,6 +47,7 @@ export const signup = async (req,res) =>{
             fullName: newUser.fullName,
             username: newUser.username,
             profilePic:newUser.profilePic,
+            gender:newUser.gender,
         })
         } else {
             return res.status(400).json({error: "Invalid user data"})
@@ -82,3 +91,23 @@ export const logout = (req,res) =>{
         res.status(500).json({error: "internal server error"}); 
     }
 }
+
+export const deleteUser = async (req, res) => {
+  try {
+    const userId = req.user._id; // Viene del middleware de autenticación
+
+    const deletedUser = await User.findByIdAndDelete(userId);
+
+    if (!deletedUser) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    // Limpiar cookie
+    res.cookie("jwt", "", { maxAge: 0 });
+
+    res.status(200).json({ message: "User deleted successfully" });
+  } catch (error) {
+    console.log("Error in deleteUser controller", error.message);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};

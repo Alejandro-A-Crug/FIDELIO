@@ -7,9 +7,17 @@ import authRoutes from "./routes/auth.routes.js"
 import messageRoutes from "./routes/message.routes.js";
 import userRoutes from "./routes/user.routes.js";
 import connectToMongo from "../db/connectToMongo.js";
+import { app, server } from "./socket/socket.js";
 
-const app= express();
+
 const PORT = process.env.PORT || 5000;
+
+import cors from "cors";
+
+app.use(cors({
+  origin: "http://localhost:3000", // tu frontend
+  credentials: true, // 👈 habilita envío de cookies
+}));
 
 
 app.use(express.json());
@@ -28,7 +36,7 @@ app.use("/api/users", userRoutes)
 
 
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
     connectToMongo();
     console.log(`Server running on port ${PORT}`)
 

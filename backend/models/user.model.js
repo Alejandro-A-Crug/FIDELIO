@@ -15,9 +15,13 @@ const userSchema = new mongoose.Schema({
         required:true,
         minlength:6
     },
+    gender:{
+        type:String,
+        default:"",
+    },
     profilePic:{
         type:String,
-        degault:"",
+        default:"",
     }
 },{timestamps: true})
 
