@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-
+//esquema para mongoDB
 const conversationSchema= new mongoose.Schema({
     participants:[
         {

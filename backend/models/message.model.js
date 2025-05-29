@@ -1,22 +1,25 @@
 import mongoose from "mongoose";
+//esquema para mongoDB
 
 const messageSchema = new mongoose.Schema({
-    senderId:{
+    senderId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
         required: true,
     },
-    receiverId:{
+    receiverId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
         required: true,
     },
-    message:{
-        type:String,
-        required:true,
+    message: {
+        type: String,
+    },
+    image: {
+        type: String, // this will be a URL or base64 string
     }
-    //Fecha de envio del mensaje 
-},{timestamps:true})
+}, { timestamps: true });
+
 
 const Message = mongoose.model("Message", messageSchema);
 
